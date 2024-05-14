@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  waltbotsqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Amk170067"
+      TZ: "America/Sao_Paulo"  
+    volumes:
+      - /home/user/Data/WaltBot/Database:/var/opt/mssql/data
+    ports:
+      - "8006:1433"
+    networks:
+      - waltbotnetwork
+
+  flask_app:
+    image: user/repo:flask-app-waltbot
+    ports:
+      - "8007:8007"
+    depends_on:
+      - waltbotsqlserver
+    networks:
+      - waltbotnetwork
+
+  react_app:
+    image: user/repo:react-app-waltbot
+    ports:
+      - "8008:85"
+    depends_on:
+      - flask_app
+    networks:
+      - waltbotnetwork
+
+networks:
+  waltbotnetwork:
+    name: waltbotnetwork
+    driver: bridge
